@@ -94,3 +94,10 @@ target/
 
 # exclude data from source control by default
 /data/
+
+# exclude runs
+/__pycache__/
+/runs/
+
+# exclude computed tokenizers
+/tokenizers/

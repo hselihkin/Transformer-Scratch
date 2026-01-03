@@ -1,3 +1,7 @@
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
 [project]
 name = "Transformer-Scratch"
 version = "0.1.0"
@@ -8,6 +12,7 @@ dependencies = [
     "datasets>=4.4.2",
     "numpy>=2.4.0",
     "python-dotenv>=1.1.1",
+    "tensorboard>=2.20.0",
     "tokenizers>=0.22.1",
     "torch>=2.9.1",
 ]

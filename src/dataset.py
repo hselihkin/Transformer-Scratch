@@ -14,13 +14,13 @@ class BilingualDataset(Dataset):
         self.lang_tgt = lang_tgt
         self.seq_len = seq_len
 
-        self.sos_token = torch.Tensor(
+        self.sos_token = torch.tensor(
             [self.tokenizer_src.token_to_id("[SOS]")], dtype=torch.int64
         )
-        self.eos_token = torch.Tensor(
+        self.eos_token = torch.tensor(
             [self.tokenizer_src.token_to_id("[EOS]")], dtype=torch.int64
         )
-        self.pad_token = torch.Tensor(
+        self.pad_token = torch.tensor(
             [self.tokenizer_src.token_to_id("[PAD]")], dtype=torch.int64
         )
 
@@ -48,9 +48,9 @@ class BilingualDataset(Dataset):
         encoder_input = torch.cat(
             [
                 self.sos_token,
-                torch.Tensor(enc_input_tokens, dtype=torch.int64),
+                torch.tensor(enc_input_tokens, dtype=torch.int64),
                 self.eos_token,
-                torch.Tensor(
+                torch.tensor(
                     [self.pad_token] * enc_num_padding_tokens, dtype=torch.int64
                 ),
             ]
@@ -59,8 +59,8 @@ class BilingualDataset(Dataset):
         decoder_input = torch.cat(
             [
                 self.sos_token,
-                torch.Tensor(dec_input_tokens, dtype=torch.int64),
-                torch.Tensor(
+                torch.tensor(dec_input_tokens, dtype=torch.int64),
+                torch.tensor(
                     [self.pad_token] * dec_num_padding_tokens, dtype=torch.int64
                 ),
             ]
@@ -68,9 +68,9 @@ class BilingualDataset(Dataset):
 
         labels = torch.cat(
             [
-                torch.Tensor(dec_input_tokens, dtype=torch.int64),
+                torch.tensor(dec_input_tokens, dtype=torch.int64),
                 self.eos_token,
-                torch.Tensor(
+                torch.tensor(
                     [self.pad_token] * (dec_num_padding_tokens), dtype=torch.int64
                 ),
             ]
@@ -83,16 +83,16 @@ class BilingualDataset(Dataset):
         return {
             "encoder_input": encoder_input,
             "decoder_input": decoder_input,
-            "encoder_masking": (encoder_input != self.pad_token)
+            "encoder_mask": (encoder_input != self.pad_token)
             .unsqueeze(0)
             .unsqueeze(0)
             .int(),  # (1, 1, seq_len)
-            "decoder_masking": (decoder_input != self.pad_token)
+            "decoder_mask": (decoder_input != self.pad_token)
             .unsqueeze(0)
             .unsqueeze(0)
             .int()
             & causal_mask(decoder_input.size(0)),  # (1, seq_len) & (1, 1, seq_len)
-            "labels": labels,
+            "label": labels,
             "src_text": src_text,
             "tgt_text": tgt_text,
         }

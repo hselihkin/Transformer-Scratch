@@ -29,7 +29,7 @@ class PostitionalEncoding(nn.Module):
         self.dropout = nn.Dropout(dropout)
 
         # create a matrix of shape (seq_len, d_model) to hold the positional encodings
-        self.pe = torch.zeros(self.seq_len, self.d_model)
+        pe = torch.zeros(self.seq_len, self.d_model)
 
         # create a vector of shape (seq_len, 1)
         position = torch.arange(0, self.seq_len, dtype=torch.float).unsqueeze(1)
@@ -39,11 +39,11 @@ class PostitionalEncoding(nn.Module):
         )
 
         # Broadcasting: Multiplying these positions by a frequency vector to create sine/cosine embeddings
-        self.pe[:, 0::2] = torch.sin(position * div_term)
-        self.pe[:, 1::2] = torch.cos(position * div_term)
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
 
-        self.pe = self.pe.unsqueeze(0)  # shape (1, seq_len, d_model)
-        self.register_buffer("pe", self.pe)
+        pe = pe.unsqueeze(0)  # shape (1, seq_len, d_model)
+        self.register_buffer("pe", pe)
 
     def forward(self, x):
         # some dimensions represent "meaning" and others represent "order" -- WHY?
@@ -52,7 +52,7 @@ class PostitionalEncoding(nn.Module):
         # 3. prevents the model from "memorizing" the fixed sinusoidal patterns too rigidly
         # No need to train the positional encodings
 
-        x = x + (self.pe[:, : x.shape[1], :]).require_grad_(False)
+        x = x + (self.pe[:, : x.shape[1], :]).requires_grad_(False)
         return self.dropout(x)
 
 
@@ -62,7 +62,7 @@ class LayerNormalization(nn.Module):
     # d_model: dimension of the model
     # eps: small value to avoid division by zero
 
-    def __init__(self, d_model: int, eps: float = 1e-6):
+    def __init__(self, d_model: int = 512, eps: float = 1e-6):
         super().__init__()
         self.d_model = d_model
         self.eps = eps
